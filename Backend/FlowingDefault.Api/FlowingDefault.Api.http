@@ -1,0 +1,6 @@
+@FlowingDefault.Api_HostAddress = http://localhost:5225
+
+GET {{FlowingDefault.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
