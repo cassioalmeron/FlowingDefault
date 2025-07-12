@@ -11,6 +11,7 @@ import RedirectIfAuth from './RedirectIfAuth';
 import Tests from './Pages/Tests';
 import { session } from './session';
 import Profile from './Pages/Profile';
+import Labels from './Pages/Labels';
 
 // Component to conditionally render layout
 const AppLayout = () => {
@@ -43,6 +44,7 @@ const AppLayout = () => {
           <Link to="/" className="sidebar-link">🏠 Home</Link>
           <Link to="/users" className="sidebar-link">👥 Users</Link>
           <Link to="/projects" className="sidebar-link">📁 Projects</Link>
+          <Link to="/labels" className="sidebar-link">🏷️ Labels</Link>
           <Link to="/profile" className="sidebar-link">👤 Profile</Link>
         </div>
         <button className="sidebar-link logout-btn" onClick={handleLogout} style={{ marginTop: 'auto', width: '100%' }}>
@@ -57,6 +59,7 @@ const AppLayout = () => {
             <Route path="/users" element={<Users />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/tests" element={<Tests />} />
+            <Route path="/labels" element={<Labels />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>

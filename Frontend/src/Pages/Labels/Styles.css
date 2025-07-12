@@ -1,0 +1,112 @@
+.labels-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.labels-title {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.labels-new-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  position: absolute;
+  left: 0;
+}
+
+.labels-new-btn:hover {
+  background-color: #218838;
+}
+
+.labels-header-actions {
+  flex: 1;
+  position: absolute;
+  right: 0;
+}
+
+.labels-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.labels-table th,
+.labels-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.labels-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.labels-table td {
+  color: #333;
+  font-size: 14px;
+}
+
+.labels-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.labels-actions-header {
+  width: 120px;
+  text-align: center;
+}
+
+.labels-actions-cell {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.labels-action-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.labels-action-btn.edit {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.labels-action-btn.edit:hover {
+  background-color: #e0a800;
+}
+
+.labels-action-btn.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.labels-action-btn.delete:hover {
+  background-color: #c82333;
+} 

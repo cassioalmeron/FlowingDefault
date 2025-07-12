@@ -11,6 +11,19 @@ namespace FlowingDefault.Core.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Label",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Label", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -46,6 +59,12 @@ namespace FlowingDefault.Core.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Label_Name",
+                table: "Label",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Project_UserId_Name",
                 table: "Project",
                 columns: new[] { "UserId", "Name" },
@@ -61,6 +80,9 @@ namespace FlowingDefault.Core.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Label");
+
             migrationBuilder.DropTable(
                 name: "Project");
 

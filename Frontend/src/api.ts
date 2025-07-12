@@ -19,6 +19,11 @@ export interface Project {
     name: string;
 }
 
+export interface Label {
+    id: number;
+    name: string;
+}
+
 // API functions
 export const api = {
   // Chat endpoints
@@ -102,6 +107,43 @@ export const api = {
     update: async (id: number, project: Omit<Project, 'id'>): Promise<Project> => {
       const token = session.getToken();
       const response = await axios.put<Project>(`${BASE_URL}/Project/${id}`, project, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    },
+  },
+  labels: {
+    list: async (): Promise<Label[]> => {
+      const token = session.getToken();
+      const response = await axios.get<Label[]>(`${BASE_URL}/Label`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    },
+    delete: async (id: number): Promise<void> => {
+      const token = session.getToken();
+      await axios.delete(`${BASE_URL}/Label/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    },
+    create: async (label: Omit<Label, 'id'>): Promise<Label> => {
+      const token = session.getToken();
+      const response = await axios.post<Label>(`${BASE_URL}/Label`, label, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    },
+    update: async (id: number, label: Omit<Label, 'id'>): Promise<Label> => {
+      const token = session.getToken();
+      const response = await axios.put<Label>(`${BASE_URL}/Label/${id}`, label, {
         headers: {
           Authorization: `Bearer ${token}`
         }

@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ProjectService>();
         services.AddScoped<UserService>();
         services.AddScoped<ProfileService>();
+        services.AddScoped<LabelService>();
 
         return services;
     }

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlowingDefault.Core.Migrations
 {
     [DbContext(typeof(FlowingDefaultDbContext))]
-    [Migration("20250702223008_InicialMigration")]
+    [Migration("20250712202723_InicialMigration")]
     partial class InicialMigration
     {
         /// <inheritdoc />
@@ -18,6 +18,24 @@ namespace FlowingDefault.Core.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.17");
+
+            modelBuilder.Entity("FlowingDefault.Core.Models.Label", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Label", (string)null);
+                });
 
             modelBuilder.Entity("FlowingDefault.Core.Models.Project", b =>
                 {
