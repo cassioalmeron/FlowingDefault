@@ -2,8 +2,6 @@ using FlowingDefault.Core.Models;
 using FlowingDefault.Core.Services;
 using FlowingDefault.Core;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using FlowingDefault.Api.DTOs;
 using FlowingDefault.Core.Dtos;
 
 namespace FlowingDefault.Api.Controllers

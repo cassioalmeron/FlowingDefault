@@ -2,18 +2,18 @@ using FlowingDefault.Core.Models;
 using FlowingDefault.Core.Services;
 using FlowingDefault.Core;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using FlowingDefault.Core.Dtos;
 
 namespace FlowingDefault.Api.Controllers
 {
     [Route("[controller]")]
-    public class LabelController : ControllerBase
+    public class LabelController : AuthorizeController
     {
         private readonly ILogger<LabelController> _logger;
         private readonly LabelService _labelService;
 
         public LabelController(ILogger<LabelController> logger, LabelService labelService)
+            : base(logger)
         {
             _logger = logger;
             _labelService = labelService;
@@ -35,7 +35,7 @@ namespace FlowingDefault.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Label>> GetById(int id)
+        public async Task<ActionResult<LabelDto>> GetById(int id)
         {
             try
             {

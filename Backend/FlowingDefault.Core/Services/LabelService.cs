@@ -18,7 +18,7 @@ namespace FlowingDefault.Core.Services
         public async Task<LabelDto> GetById(int id)
         {
             var label = await _dbContext.Set<Label>().FindAsync(id);
-            return label.CopyTo<LabelDto>();
+            return label?.CopyTo<LabelDto>();
         }
 
         public async Task Save(LabelDto labelDto)
