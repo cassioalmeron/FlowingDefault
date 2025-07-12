@@ -1,6 +1,7 @@
 using FlowingDefault.Core;
 using FlowingDefault.Core.Models;
 using FlowingDefault.Core.Services;
+using FlowingDefault.Core.Utils;
 using FlowingDefault.Tests.Mocks;
 
 namespace FlowingDefault.Tests.Core.Services
@@ -15,13 +16,14 @@ namespace FlowingDefault.Tests.Core.Services
         public LoginServiceTest()
         {
             _context = new TestDbContext();
+            _context.InitializeTestDatabase();
             _service = new LoginService(_context);
             
             _testUser = new User
             {
                 Name = "Cassio Almeron",
                 Username = "cassioalmeron",
-                Password = "123456"
+                Password = HashUtils.GenerateMd5Hash("123456")
             };
         }
 
@@ -39,7 +41,7 @@ namespace FlowingDefault.Tests.Core.Services
             Assert.IsNotNull(result);
             Assert.AreEqual("Cassio Almeron", result.Name);
             Assert.AreEqual("cassioalmeron", result.Username);
-            Assert.AreEqual("123456", result.Password);
+            Assert.AreEqual(HashUtils.GenerateMd5Hash("123456"), result.Password);
         }
 
         [TestMethod]

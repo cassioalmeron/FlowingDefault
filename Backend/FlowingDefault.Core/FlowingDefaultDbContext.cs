@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FlowingDefault.Core.Models;
+using FlowingDefault.Core.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlowingDefault.Core;
@@ -29,5 +30,31 @@ public class FlowingDefaultDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
+    /// <summary>
+    /// Ensures that the database exists and the admin user is created (synchronous version)
+    /// </summary>
+    public void EnsureDatabaseAndAdminUser()
+    {
+        // Ensure database is created
+        Database.EnsureCreated();
+        
+        // Check if admin user exists
+        var adminUser = Users.Find(1);
+        
+        if (adminUser == null)
+        {
+            adminUser = new User
+            {
+                Id = 1,
+                Name = "Administrator",
+                Username = "admin",
+                Password = HashUtils.GenerateMd5Hash("admin")
+            };
+
+            Users.Add(adminUser);
+            SaveChanges();
+        }
     }
 }

@@ -1,6 +1,8 @@
 using System.Text;
 using FlowingDefault.Api.Middleware;
 using FlowingDefault.Api.Services;
+using FlowingDefault.Core;
+using FlowingDefault.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -33,6 +35,9 @@ builder.Host.UseSerilog(Log.Logger);
 // Configure JWT Settings
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 builder.Services.AddSingleton(jwtSettings);
+
+var jwtService = new JwtService(jwtSettings);
+builder.Services.AddSingleton(jwtService);
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -72,6 +77,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddInfrastructuralServices();
+
+builder.Services.AddDbContext<FlowingDefaultDbContext>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -89,8 +98,19 @@ app.UseRequestLogging();
 // Use the CORS policy
 app.UseCors("AllowAll");
 
+// Add authentication middleware
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Ensure database and admin user exists
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<FlowingDefaultDbContext>();
+    dbContext.EnsureDatabaseAndAdminUser();
+    Log.Information("Database and admin user verification completed");
+}
 
 app.Run();

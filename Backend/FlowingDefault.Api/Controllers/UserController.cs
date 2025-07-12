@@ -3,18 +3,18 @@ using FlowingDefault.Core.Services;
 using FlowingDefault.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using FlowingDefault.Api.DTOs;
+using FlowingDefault.Core.Dtos;
 
 namespace FlowingDefault.Api.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
-    [Authorize]
-    public class UserController : ControllerBase
+    public class UserController : AuthorizeController
     {
         private readonly ILogger<UserController> _logger;
         private readonly UserService _userService;
 
-        public UserController(ILogger<UserController> logger, UserService userService)
+        public UserController(ILogger<UserController> logger, UserService userService) : base(logger)
         {
             _logger = logger;
             _userService = userService;
@@ -49,12 +49,26 @@ namespace FlowingDefault.Api.Controllers
         {
             try
             {
+                var currentUserId = GetCurrentUserId();
+                
+                // Prevent user from viewing other users' data
+                if (id != currentUserId)
+                {
+                    _logger.LogWarning("User {CurrentUserId} attempted to view user {TargetUserId}", currentUserId, id);
+                    return BadRequest("You can only view your own account");
+                }
+
                 var user = await _userService.GetById(id);
                 
                 if (user == null)
                     return NotFound($"User with ID {id} not found");
 
                 return Ok(user);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
@@ -66,19 +80,26 @@ namespace FlowingDefault.Api.Controllers
         /// <summary>
         /// Create a new user
         /// </summary>
-        /// <param name="user">User data</param>
+        /// <param name="userDto">User data</param>
         /// <returns>Created user with ID</returns>
         [HttpPost]
-        public async Task<ActionResult<User>> Create([FromBody] User user)
+        public async Task<ActionResult<UserDto>> Create([FromBody] UserDto userDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                await _userService.Save(user);
-                
-                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+                var currentUserId = GetCurrentUserId();
+                if (currentUserId != 1)
+                {
+                    _logger.LogWarning("User {UserId} attempted to delete themselves", currentUserId);
+                    return BadRequest("Only the Admin can create users.");
+                }
+
+                await _userService.Save(userDto);
+
+                return Ok(userDto);
             }
             catch (FlowingDefaultException ex)
             {
@@ -96,26 +117,36 @@ namespace FlowingDefault.Api.Controllers
         /// Update an existing user
         /// </summary>
         /// <param name="id">User ID</param>
-        /// <param name="user">Updated user data</param>
+        /// <param name="userDto">Updated user data</param>
         /// <returns>Updated user</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<User>> Update(int id, [FromBody] User user)
+        public async Task<ActionResult<UserDto>> Update(int id, [FromBody] UserDto userDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                if (id != user.Id)
-                    return BadRequest("ID in URL does not match ID in request body");
+                var currentUserId = GetCurrentUserId();
+                if (currentUserId != 1)
+                {
+                    _logger.LogWarning("User {UserId} attempted to delete themselves", currentUserId);
+                    return BadRequest("Only the Admin can update users.");
+                }
 
                 var existingUser = await _userService.GetById(id);
                 if (existingUser == null)
                     return NotFound($"User with ID {id} not found");
 
-                await _userService.Save(user);
+                userDto.Id = id;
+                await _userService.Save(userDto);
                 
-                return Ok(user);
+                return Ok(userDto);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
             }
             catch (FlowingDefaultException ex)
             {
@@ -139,6 +170,21 @@ namespace FlowingDefault.Api.Controllers
         {
             try
             {
+                var currentUserId = GetCurrentUserId();
+
+                if (currentUserId != 1)
+                {
+                    _logger.LogWarning("User {UserId} attempted to delete themselves", currentUserId);
+                    return BadRequest("Only the Admin can delete users.");
+                }
+
+                // Prevent user from deleting themselves
+                if (id == currentUserId)
+                {
+                    _logger.LogWarning("User {UserId} attempted to delete themselves", currentUserId);
+                    return BadRequest("You cannot delete your own account.");
+                }
+
                 var deleted = await _userService.Delete(id);
                 
                 if (!deleted)
@@ -146,10 +192,49 @@ namespace FlowingDefault.Api.Controllers
 
                 return NoContent();
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
+            }
+            catch (FlowingDefaultException ex)
+            {
+                _logger.LogWarning(ex, ex.Message);
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting user {UserId}", id);
                 return StatusCode(500, "An error occurred while deleting the user");
+            }
+        }
+
+        /// <summary>
+        /// Get current authenticated user
+        /// </summary>
+        /// <returns>Current user information</returns>
+        [HttpGet("me")]
+        public async Task<ActionResult<User>> GetCurrentUser()
+        {
+            try
+            {
+                var currentUserId = GetCurrentUserId();
+                var user = await _userService.GetById(currentUserId);
+                
+                if (user == null)
+                    return NotFound("Current user not found");
+
+                return Ok(user);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving current user");
+                return StatusCode(500, "An error occurred while retrieving current user");
             }
         }
 

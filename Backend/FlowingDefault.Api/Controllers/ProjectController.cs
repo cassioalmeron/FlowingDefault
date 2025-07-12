@@ -1,46 +1,51 @@
 using FlowingDefault.Core.Models;
 using FlowingDefault.Core.Services;
 using FlowingDefault.Core;
+using FlowingDefault.Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace FlowingDefault.Api.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
-    [Authorize]
-    public class ProjectController : ControllerBase
+    public class ProjectController : AuthorizeController
     {
         private readonly ILogger<ProjectController> _logger;
         private readonly ProjectService _projectService;
 
-        public ProjectController(ILogger<ProjectController> logger, ProjectService projectService)
+        public ProjectController(ILogger<ProjectController> logger, ProjectService projectService) : base(logger)
         {
             _logger = logger;
             _projectService = projectService;
         }
 
         /// <summary>
-        /// Get all projects
+        /// Get all projects for the current user
         /// </summary>
-        /// <returns>List of all projects</returns>
+        /// <returns>List of all projects for the current user</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Project>>> GetAll()
         {
             try
             {
-                var projects = await _projectService.GetAll();
+                var currentUserId = GetCurrentUserId();
+                var projects = await _projectService.GetAll(currentUserId);
                 return Ok(projects);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving all projects");
+                _logger.LogError(ex, "Error retrieving projects for user");
                 return StatusCode(500, "An error occurred while retrieving projects");
             }
         }
 
         /// <summary>
-        /// Get project by ID
+        /// Get project by ID for the current user
         /// </summary>
         /// <param name="id">Project ID</param>
         /// <returns>Project if found, NotFound if not found</returns>
@@ -49,12 +54,18 @@ namespace FlowingDefault.Api.Controllers
         {
             try
             {
-                var project = await _projectService.GetById(id);
+                var currentUserId = GetCurrentUserId();
+                var project = await _projectService.GetById(id, currentUserId);
                 
                 if (project == null)
                     return NotFound($"Project with ID {id} not found");
 
                 return Ok(project);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
@@ -89,16 +100,17 @@ namespace FlowingDefault.Api.Controllers
         /// <param name="project">Project data</param>
         /// <returns>Created project with ID</returns>
         [HttpPost]
-        public async Task<ActionResult<Project>> Create([FromBody] Project project)
+        public async Task<ActionResult<Project>> Create([FromBody] ProjectDto dto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                await _projectService.Save(project);
+                var currentUserId = GetCurrentUserId();
+                await _projectService.Save(dto, currentUserId);
                 
-                return CreatedAtAction(nameof(GetById), new { id = project.Id }, project);
+                return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
             }
             catch (FlowingDefaultException ex)
             {
@@ -119,23 +131,28 @@ namespace FlowingDefault.Api.Controllers
         /// <param name="project">Updated project data</param>
         /// <returns>Updated project</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<Project>> Update(int id, [FromBody] Project project)
+        public async Task<ActionResult<Project>> Update(int id, [FromBody] ProjectDto dto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                if (id != project.Id)
-                    return BadRequest("ID in URL does not match ID in request body");
-
-                var existingProject = await _projectService.GetById(id);
+                var currentUserId = GetCurrentUserId();
+                var existingProject = await _projectService.GetById(id, currentUserId);
                 if (existingProject == null)
                     return NotFound($"Project with ID {id} not found");
 
-                await _projectService.Save(project);
+                dto.Id = id;
+
+                await _projectService.Save(dto, currentUserId);
                 
-                return Ok(project);
+                return Ok(dto);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
             }
             catch (FlowingDefaultException ex)
             {
@@ -159,12 +176,18 @@ namespace FlowingDefault.Api.Controllers
         {
             try
             {
-                var deleted = await _projectService.Delete(id);
+                var currentUserId = GetCurrentUserId();
+                var deleted = await _projectService.Delete(id, currentUserId);
                 
                 if (!deleted)
                     return NotFound($"Project with ID {id} not found");
 
                 return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {
@@ -195,7 +218,53 @@ namespace FlowingDefault.Api.Controllers
         }
 
         /// <summary>
-        /// Check if project exists
+        /// Test endpoint to verify token claims
+        /// </summary>
+        /// <returns>Current user information from token</returns>
+        [HttpGet("test-token")]
+        public ActionResult<object> TestToken()
+        {
+            try
+            {
+                // Get the authorization header
+                var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                {
+                    return BadRequest(new { Error = "Authorization header not found or invalid format" });
+                }
+
+                // Extract the token from the Bearer header
+                var token = authHeader.Substring("Bearer ".Length).Trim();
+                
+                // Decode the JWT token
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+                
+                var claims = jwtToken.Claims.Select(c => new { c.Type, c.Value }).ToList();
+                var userId = GetCurrentUserId();
+                
+                return Ok(new
+                {
+                    UserId = userId,
+                    AllClaims = claims,
+                    Username = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.UniqueName)?.Value,
+                    TokenInfo = new
+                    {
+                        Issuer = jwtToken.Issuer,
+                        Audience = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Aud)?.Value,
+                        ValidFrom = jwtToken.ValidFrom,
+                        ValidTo = jwtToken.ValidTo
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Check if project exists for the current user
         /// </summary>
         /// <param name="id">Project ID</param>
         /// <returns>True if project exists, false otherwise</returns>
@@ -204,8 +273,14 @@ namespace FlowingDefault.Api.Controllers
         {
             try
             {
-                var exists = await _projectService.ProjectExists(id);
+                var currentUserId = GetCurrentUserId();
+                var exists = await _projectService.ProjectExists(id, currentUserId);
                 return Ok(exists);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Unauthorized access attempt");
+                return Unauthorized(ex.Message);
             }
             catch (Exception ex)
             {

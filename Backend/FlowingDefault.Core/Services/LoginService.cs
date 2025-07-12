@@ -1,4 +1,5 @@
 ﻿using FlowingDefault.Core.Models;
+using FlowingDefault.Core.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlowingDefault.Core.Services
@@ -25,7 +26,8 @@ namespace FlowingDefault.Core.Services
             if (user == null)
                 throw new FlowingDefaultException(invalidMessage);
 
-            if (user.Password != password)
+            var hashedPassword = HashUtils.GenerateMd5Hash(password);
+            if (user.Password != hashedPassword)
                 throw new FlowingDefaultException(invalidMessage);
 
             return user;

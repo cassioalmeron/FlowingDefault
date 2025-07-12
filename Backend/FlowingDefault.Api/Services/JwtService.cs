@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using FlowingDefault.Core;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FlowingDefault.Api.Services;
@@ -17,6 +18,9 @@ public class JwtService
     //public string GenerateToken(string userId, string email, string role)
     public string GenerateToken(string userId, string username)
     {
+        if (_jwtSettings.Key.Length < 32)
+            throw new FlowingDefaultException("The JWT Key must have at least 32 characters.");
+
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
