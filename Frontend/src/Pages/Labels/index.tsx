@@ -5,6 +5,7 @@ import '../../styles/Common.css';
 import './Styles.css';
 import LabelModal from './LabelModal';
 import Grid from '../../components/Grid';
+import DeleteButton from '../../components/DeleteButton';
 import type { GridColumn } from '../../components/Grid';
 import type { Label } from './types';
 
@@ -22,9 +23,7 @@ const Labels: React.FC = () => {
   const [modalLabel, setModalLabel] = useState<Label>(emptyLabel);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
   const [errors, setErrors] = useState<{ name?: string }>({});
 
   useEffect(() => {
@@ -102,17 +101,11 @@ const Labels: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
-    setDeleteId(id);
-    setConfirmOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (deleteId == null) return;
-    setDeleteLoading(true);
+  const handleDelete = async (id: number) => {
+    setDeleteLoading(id);
     try {
-      await api.labels.delete(deleteId);
-      setLabels(labels.filter(label => label.id !== deleteId));
+      await api.labels.delete(id);
+      setLabels(labels.filter(label => label.id !== id));
       toast.success('Label deleted successfully!');
     } catch (error: unknown) {
       if (typeof error === 'object' && error !== null && 'response' in error) {
@@ -122,9 +115,7 @@ const Labels: React.FC = () => {
         toast.error('Failed to delete label');
       }
     } finally {
-      setDeleteLoading(false);
-      setConfirmOpen(false);
-      setDeleteId(null);
+      setDeleteLoading(null);
     }
   };
 
@@ -143,7 +134,11 @@ const Labels: React.FC = () => {
         renderActions={label => (
           <>
             <button className="labels-action-btn edit" onClick={() => openEditModal(label)}>Edit</button>
-            <button className="labels-action-btn delete" onClick={() => handleDelete(label.id)}>Delete</button>
+            <DeleteButton
+              onConfirm={() => handleDelete(label.id)}
+              loading={deleteLoading === label.id}
+              confirmMessage={<p>Are you sure you want to delete this label?</p>}
+            />
           </>
         )}
       />
@@ -157,20 +152,6 @@ const Labels: React.FC = () => {
         onClose={closeModal}
         errors={errors}
       />
-      {/* Confirm Delete Modal */}
-      {confirmOpen && (
-        <div className="common-modal-backdrop">
-          <div className="common-modal" style={{ minWidth: 320, maxWidth: 400 }}>
-            <div style={{ marginBottom: 24 }}>Are you sure you want to delete this label?</div>
-            <div className="common-modal-actions">
-              <button className="common-modal-cancel" onClick={() => setConfirmOpen(false)} disabled={deleteLoading}>Cancel</button>
-              <button className="common-modal-save" onClick={confirmDelete} disabled={deleteLoading}>
-                {deleteLoading ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

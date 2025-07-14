@@ -4,8 +4,8 @@ import { api } from '../../api';
 import '../../styles/Common.css';
 import './Styles.css';
 import UserModal from './UserModal';
-import ConfirmDialog from '../../components/ConfirmDialog';
 import Grid from '../../components/Grid';
+import DeleteButton from '../../components/DeleteButton';
 import type { GridColumn } from '../../components/Grid';
 import type { User } from './types';
 
@@ -24,9 +24,7 @@ const Index = () => {
   const [modalUser, setModalUser] = useState<User>(emptyUser);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -80,24 +78,16 @@ const Index = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
-    setDeleteId(id);
-    setConfirmOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (deleteId == null) return;
-    setDeleteLoading(true);
+  const handleDelete = async (id: number) => {
+    setDeleteLoading(id);
     try {
-      await api.users.delete(deleteId);
-      setUsers(users.filter(user => user.id !== deleteId));
+      await api.users.delete(id);
+      setUsers(users.filter(user => user.id !== id));
       toast.success('User deleted successfully!');
     } catch {
       toast.error('Failed to delete user');
     } finally {
-      setDeleteLoading(false);
-      setConfirmOpen(false);
-      setDeleteId(null);
+      setDeleteLoading(null);
     }
   };
 
@@ -116,7 +106,11 @@ const Index = () => {
         renderActions={user => (
           <>
             <button className="action-btn edit" onClick={() => openEditModal(user)}>Edit</button>
-            <button className="action-btn delete" onClick={() => handleDelete(user.id)}>Delete</button>
+            <DeleteButton
+              onConfirm={() => handleDelete(user.id)}
+              loading={deleteLoading === user.id}
+              confirmMessage={<p>Are you sure you want to delete this user?</p>}
+            />
           </>
         )}
       />
@@ -128,15 +122,6 @@ const Index = () => {
         onChange={setModalUser}
         onSave={handleSave}
         onClose={closeModal}
-      />
-      <ConfirmDialog
-        open={confirmOpen}
-        message={<p>Are you sure you want to delete this user?</p>}
-        onConfirm={confirmDelete}
-        onCancel={() => { setConfirmOpen(false); setDeleteId(null); }}
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        loading={deleteLoading}
       />
     </div>
   );

@@ -4,8 +4,8 @@ import { toast } from 'react-toastify';
 import '../../styles/Common.css';
 import './Styles.css';
 import ProjectModal from './ProjectModal';
-import ConfirmDialog from '../../components/ConfirmDialog';
 import Grid from '../../components/Grid';
+import DeleteButton from '../../components/DeleteButton';
 import type { GridColumn } from '../../components/Grid';
 import type { Project } from './types';
 
@@ -23,9 +23,7 @@ const Projects: React.FC = () => {
   const [modalProject, setModalProject] = useState<Project>(emptyProject);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -79,24 +77,16 @@ const Projects: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: number) => {
-    setDeleteId(id);
-    setConfirmOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (deleteId == null) return;
-    setDeleteLoading(true);
+  const handleDelete = async (id: number) => {
+    setDeleteLoading(id);
     try {
-      await api.projects.delete(deleteId);
-      setProjects(projects.filter(project => project.id !== deleteId));
+      await api.projects.delete(id);
+      setProjects(projects.filter(project => project.id !== id));
       toast.success('Project deleted successfully!');
     } catch {
       toast.error('Failed to delete project');
     } finally {
-      setDeleteLoading(false);
-      setConfirmOpen(false);
-      setDeleteId(null);
+      setDeleteLoading(null);
     }
   };
 
@@ -115,7 +105,11 @@ const Projects: React.FC = () => {
         renderActions={project => (
           <>
             <button className="action-btn edit" onClick={() => openEditModal(project)}>Edit</button>
-            <button className="action-btn delete" onClick={() => handleDelete(project.id)}>Delete</button>
+            <DeleteButton
+              onConfirm={() => handleDelete(project.id)}
+              loading={deleteLoading === project.id}
+              confirmMessage={<p>Are you sure you want to delete this project?</p>}
+            />
           </>
         )}
       />
@@ -127,15 +121,6 @@ const Projects: React.FC = () => {
         onChange={setModalProject}
         onSave={handleSave}
         onClose={closeModal}
-      />
-      <ConfirmDialog
-        open={confirmOpen}
-        message={<p>Are you sure you want to delete this project?</p>}
-        onConfirm={confirmDelete}
-        onCancel={() => { setConfirmOpen(false); setDeleteId(null); }}
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        loading={deleteLoading}
       />
     </div>
   );
