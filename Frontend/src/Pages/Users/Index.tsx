@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../../api';
 import { toast } from 'react-toastify';
+import { api } from '../../api';
 import '../../styles/Common.css';
 import './Styles.css';
 import UserModal from './UserModal';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import Grid from '../../components/Grid';
+import type { GridColumn } from '../../components/Grid';
 import type { User } from './types';
 
 const emptyUser: User = { id: 0, name: '', username: '' };
+
+const columns: GridColumn<User>[] = [
+  { header: 'Id', accessor: 'id' },
+  { header: 'Name', accessor: 'name' },
+  { header: 'Username', accessor: 'username' },
+];
 
 const Index = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -65,8 +73,8 @@ const Index = () => {
         toast.success('User created!');
       }
       closeModal();
-    } catch (error: any) {
-      toast.error(error.response?.data || 'Failed to save user');
+    } catch {
+      toast.error('Failed to save user');
     } finally {
       setSaving(false);
     }
@@ -84,8 +92,8 @@ const Index = () => {
       await api.users.delete(deleteId);
       setUsers(users.filter(user => user.id !== deleteId));
       toast.success('User deleted successfully!');
-    } catch (error: any) {
-      toast.error(error.response?.data || 'Failed to delete user');
+    } catch {
+      toast.error('Failed to delete user');
     } finally {
       setDeleteLoading(false);
       setConfirmOpen(false);
@@ -102,30 +110,16 @@ const Index = () => {
         <h2 className="page-title">Users</h2>
         <div className="page-header-actions"></div>
       </div>
-      <table className="common-table">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Username</th>
-            <th className="common-actions-header">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.name}</td>
-              <td>{user.username}</td>
-              <td className="common-actions-cell">
-                <button className="action-btn edit" onClick={() => openEditModal(user)}>Edit</button>
-                <button className="action-btn delete" onClick={() => handleDelete(user.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+      <Grid
+        columns={columns}
+        data={users}
+        renderActions={user => (
+          <>
+            <button className="action-btn edit" onClick={() => openEditModal(user)}>Edit</button>
+            <button className="action-btn delete" onClick={() => handleDelete(user.id)}>Delete</button>
+          </>
+        )}
+      />
       <UserModal
         open={modalOpen}
         user={modalUser}

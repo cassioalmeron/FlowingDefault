@@ -5,9 +5,16 @@ import '../../styles/Common.css';
 import './Styles.css';
 import ProjectModal from './ProjectModal';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import Grid from '../../components/Grid';
+import type { GridColumn } from '../../components/Grid';
 import type { Project } from './types';
 
 const emptyProject: Project = { id: 0, name: '' };
+
+const columns: GridColumn<Project>[] = [
+  { header: 'Id', accessor: 'id' },
+  { header: 'Name', accessor: 'name' },
+];
 
 const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -102,28 +109,16 @@ const Projects: React.FC = () => {
         <h2 className="page-title">Projects</h2>
         <div className="page-header-actions"></div>
       </div>
-      <table className="common-table">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th className="common-actions-header">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.map(project => (
-            <tr key={project.id}>
-              <td>{project.id}</td>
-              <td>{project.name}</td>
-              <td className="common-actions-cell">
-                <button className="action-btn edit" onClick={() => openEditModal(project)}>Edit</button>
-                <button className="action-btn delete" onClick={() => handleDelete(project.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
+      <Grid
+        columns={columns}
+        data={projects}
+        renderActions={project => (
+          <>
+            <button className="action-btn edit" onClick={() => openEditModal(project)}>Edit</button>
+            <button className="action-btn delete" onClick={() => handleDelete(project.id)}>Delete</button>
+          </>
+        )}
+      />
       <ProjectModal
         open={modalOpen}
         project={modalProject}

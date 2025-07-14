@@ -4,9 +4,16 @@ import { api } from '../../api';
 import '../../styles/Common.css';
 import './Styles.css';
 import LabelModal from './LabelModal';
+import Grid from '../../components/Grid';
+import type { GridColumn } from '../../components/Grid';
 import type { Label } from './types';
 
 const emptyLabel: Label = { id: 0, name: '' };
+
+const columns: GridColumn<Label>[] = [
+  { header: 'Id', accessor: 'id' },
+  { header: 'Name', accessor: 'name' },
+];
 
 const Labels: React.FC = () => {
   const [labels, setLabels] = useState<Label[]>([]);
@@ -130,29 +137,16 @@ const Labels: React.FC = () => {
         <h2 className="labels-title">Labels</h2>
         <div className="labels-header-actions"></div>
       </div>
-      <table className="labels-table">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th className="labels-actions-header">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {labels.map(label => (
-            <tr key={label.id}>
-              <td>{label.id}</td>
-              <td>{label.name}</td>
-              <td className="labels-actions-cell">
-                <button className="labels-action-btn edit" onClick={() => openEditModal(label)}>Edit</button>
-                <button className="labels-action-btn delete" onClick={() => handleDelete(label.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Modal for create/edit */}
+      <Grid
+        columns={columns}
+        data={labels}
+        renderActions={label => (
+          <>
+            <button className="labels-action-btn edit" onClick={() => openEditModal(label)}>Edit</button>
+            <button className="labels-action-btn delete" onClick={() => handleDelete(label.id)}>Delete</button>
+          </>
+        )}
+      />
       <LabelModal
         open={modalOpen}
         label={modalLabel}
@@ -163,7 +157,6 @@ const Labels: React.FC = () => {
         onClose={closeModal}
         errors={errors}
       />
-
       {/* Confirm Delete Modal */}
       {confirmOpen && (
         <div className="common-modal-backdrop">
