@@ -37,15 +37,11 @@ namespace FlowingDefault.Api.Controllers
 
                 var user = await _loginService.Execute(request.Username, request.Password);
 
-                var token = _jwtService.GenerateToken(
+                var response = _jwtService.GenerateToken(
                     userId: user.Id.ToString(),
-                    username: user.Username
+                    username: user.Username,
+                    name: user.Name
                 );
-
-                var response = new LoginResponseDto
-                {
-                    Token = token
-                };
 
                 _logger.LogInformation("User {Username} authenticated successfully", request.Username);
 

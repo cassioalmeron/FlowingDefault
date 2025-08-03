@@ -5,9 +5,11 @@ import '../../styles/Common.css';
 import './Styles.css';
 import ProjectModal from './ProjectModal';
 import Grid from '../../components/Grid';
-import DeleteButton from '../../components/DeleteButton';
 import type { GridColumn } from '../../components/Grid';
 import type { Project } from './types';
+import EditButton from '../../components/EditButton';
+import DeleteButton from '../../components/DeleteButton';
+import NewButton from '../../components/NewButton';
 
 const emptyProject: Project = { id: 0, name: '' };
 
@@ -95,7 +97,7 @@ const Projects: React.FC = () => {
   return (
     <div>
       <div className="page-header">
-        <button className="page-new-btn" onClick={openNewModal}>New</button>
+        <NewButton onClick={openNewModal} />
         <h2 className="page-title">Projects</h2>
         <div className="page-header-actions"></div>
       </div>
@@ -104,7 +106,7 @@ const Projects: React.FC = () => {
         data={projects}
         renderActions={project => (
           <>
-            <button className="action-btn edit" onClick={() => openEditModal(project)}>Edit</button>
+            <EditButton onClick={() => openEditModal(project)} />
             <DeleteButton
               onConfirm={() => handleDelete(project.id)}
               loading={deleteLoading === project.id}

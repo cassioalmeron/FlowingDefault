@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { api } from '../../api';
 import '../../styles/Common.css';
@@ -8,6 +8,8 @@ import Grid from '../../components/Grid';
 import DeleteButton from '../../components/DeleteButton';
 import type { GridColumn } from '../../components/Grid';
 import type { User } from './types';
+import EditButton from '../../components/EditButton';
+import NewButton from '../../components/NewButton';
 
 const emptyUser: User = { id: 0, name: '', username: '' };
 
@@ -96,7 +98,7 @@ const Index = () => {
   return (
     <div>
       <div className="page-header">
-        <button className="page-new-btn" onClick={openNewModal}>New</button>
+        <NewButton onClick={openNewModal} />
         <h2 className="page-title">Users</h2>
         <div className="page-header-actions"></div>
       </div>
@@ -105,7 +107,7 @@ const Index = () => {
         data={users}
         renderActions={user => (
           <>
-            <button className="action-btn edit" onClick={() => openEditModal(user)}>Edit</button>
+            <EditButton onClick={() => openEditModal(user)} />
             <DeleteButton
               onConfirm={() => handleDelete(user.id)}
               loading={deleteLoading === user.id}
