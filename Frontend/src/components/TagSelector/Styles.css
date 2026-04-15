@@ -5,9 +5,11 @@
 
 .tag-selector label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   font-weight: 500;
-  color: #333;
+  color: var(--text-secondary);
+  font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
 .tag-selector-input {
@@ -15,22 +17,23 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
+  background: var(--glass-bg-light);
+  border: var(--border-glass-light);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: var(--transition-fast);
   height: 36px;
   box-sizing: border-box;
 }
 
 .tag-selector-input:hover {
-  border-color: #007bff;
+  background: var(--glass-bg-medium);
+  border-color: rgba(56, 189, 248, 0.3);
 }
 
 .tag-selector-display {
   flex: 1;
-  color: #666;
+  color: var(--text-muted);
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -47,24 +50,27 @@
 .inline-tag {
   display: inline-flex;
   align-items: center;
-  padding: 2px 6px;
-  border-radius: 8px;
-  background-color: #007bff;
-  color: white;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  border: 1px solid rgba(56, 189, 248, 0.2);
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: var(--transition-fast);
   white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .inline-tag:hover {
-  opacity: 0.8;
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.4);
 }
 
 .tag-selector-arrow {
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted);
   transition: transform 0.2s ease;
 }
 
@@ -73,13 +79,23 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(8, 18, 42, 0.90);
+  backdrop-filter: var(--blur-lg);
+  -webkit-backdrop-filter: var(--blur-lg);
+  border: var(--border-glass-medium);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glass-panel);
   z-index: 1001;
   max-height: 200px;
   overflow-y: auto;
+  margin-top: 4px;
+}
+
+.tag-selector-dropdown::-webkit-scrollbar { width: 4px; }
+.tag-selector-dropdown::-webkit-scrollbar-track { background: transparent; }
+.tag-selector-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
 }
 
 .tag-option {
@@ -87,15 +103,19 @@
   align-items: center;
   padding: 8px 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: var(--transition-fast);
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .tag-option:hover {
-  background-color: #f8f9fa;
+  background: var(--glass-bg-medium);
+  color: var(--text-primary);
 }
 
 .tag-option.selected {
-  background-color: #e3f2fd;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
 }
 
 .tag-color-dot {
@@ -112,9 +132,7 @@
 }
 
 .tag-check {
-  color: #007bff;
+  color: var(--color-primary);
   font-weight: bold;
   margin-left: 8px;
 }
-
- 

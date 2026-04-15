@@ -1,10 +1,9 @@
 .project-modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 5, 18, 0.65);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,17 +11,24 @@
 }
 
 .project-modal {
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
+  background: rgba(10, 20, 45, 0.75);
+  backdrop-filter: var(--blur-xl);
+  -webkit-backdrop-filter: var(--blur-xl);
+  border: var(--border-glass-medium);
+  border-radius: var(--radius-xl);
+  padding: 28px 32px;
   min-width: 400px;
   max-width: 500px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-glass-modal);
+  will-change: transform;
 }
 
 .project-modal h3 {
   margin: 0 0 20px 0;
-  color: #333;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .project-modal-form {
@@ -35,25 +41,39 @@
 .project-modal-form label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   font-weight: 500;
-  color: #555;
+  color: var(--text-secondary);
+  font-size: 13px;
+  letter-spacing: 0.02em;
   text-align: left;
 }
 
 .project-modal-form input,
 .project-modal-form textarea {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 9px 13px;
+  background: var(--glass-bg-light);
+  border: var(--border-glass-light);
+  border-radius: var(--radius-md);
   font-size: 14px;
+  font-family: var(--font-primary);
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.project-modal-form input::placeholder,
+.project-modal-form textarea::placeholder {
+  color: var(--text-muted);
 }
 
 .project-modal-form input:focus,
 .project-modal-form textarea:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  background: var(--glass-bg-medium);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: var(--shadow-glass-input-focus);
 }
 
 .project-modal-form textarea {
@@ -69,34 +89,47 @@
 
 .project-modal-cancel,
 .project-modal-save {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  font-family: var(--font-primary);
+  transition: var(--transition-fast);
 }
 
 .project-modal-cancel {
-  background-color: #6c757d;
-  color: white;
+  background: var(--color-neutral-bg);
+  color: var(--color-neutral);
+  border: var(--border-glass-light);
+  font-weight: 500;
 }
 
 .project-modal-cancel:hover:not(:disabled) {
-  background-color: #5a6268;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-btn-hover);
 }
 
 .project-modal-save {
-  background-color: #007bff;
-  color: white;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  font-weight: 600;
 }
 
 .project-modal-save:hover:not(:disabled) {
-  background-color: #0056b3;
+  background: rgba(56, 189, 248, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow:
+    0 0 0 2px rgba(56, 189, 248, 0.2),
+    0 4px 16px rgba(56, 189, 248, 0.15);
+  transform: translateY(-1px);
 }
 
 .project-modal-cancel:disabled,
 .project-modal-save:disabled {
-  opacity: 0.6;
+  opacity: 0.35;
   cursor: not-allowed;
-} 
+  transform: none;
+  box-shadow: none;
+}

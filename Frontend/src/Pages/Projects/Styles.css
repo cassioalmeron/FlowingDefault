@@ -2,37 +2,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   padding: 16px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: var(--border-bottom-divider);
   position: relative;
 }
 
 .projects-title {
   margin: 0;
-  color: #333;
-  font-size: 24px;
+  color: var(--text-primary);
+  font-size: 22px;
   font-weight: 600;
+  letter-spacing: -0.02em;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  text-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
 }
 
 .projects-new-btn {
-  background-color: #28a745;
-  color: white;
-  border: none;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid rgba(74, 222, 128, 0.25);
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
+  font-size: 13px;
+  font-weight: 600;
+  transition: var(--transition-fast);
   position: absolute;
   left: 0;
 }
 
 .projects-new-btn:hover {
-  background-color: #218838;
+  background: rgba(74, 222, 128, 0.2);
+  border-color: rgba(74, 222, 128, 0.45);
+  box-shadow: var(--shadow-glow-success);
+  transform: translateY(-1px);
 }
 
 .projects-header-actions {
@@ -43,34 +49,46 @@
 
 .projects-table {
   width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--glass-bg-subtle);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-glass-panel);
+  border: var(--border-glass-subtle);
 }
 
 .projects-table th,
 .projects-table td {
   padding: 12px 16px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: var(--border-bottom-divider);
 }
 
 .projects-table th {
-  background-color: #f8f9fa;
+  background: var(--glass-bg-header);
   font-weight: 600;
-  color: #495057;
-  font-size: 14px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .projects-table td {
-  color: #333;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
-.projects-table tr:hover {
-  background-color: #f8f9fa;
+.projects-table thead tr:first-child th:first-child { border-top-left-radius: var(--radius-lg); }
+.projects-table thead tr:first-child th:last-child  { border-top-right-radius: var(--radius-lg); }
+.projects-table tbody tr:last-child td              { border-bottom: none; }
+.projects-table tbody tr:last-child td:first-child  { border-bottom-left-radius: var(--radius-lg); }
+.projects-table tbody tr:last-child td:last-child   { border-bottom-right-radius: var(--radius-lg); }
+
+.projects-table tbody tr:hover td {
+  background: var(--glass-bg-light);
 }
 
 .projects-actions-header {
@@ -85,28 +103,36 @@
 }
 
 .projects-action-btn {
-  padding: 4px 8px;
-  border: none;
-  border-radius: 4px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 12px;
-  transition: background-color 0.2s;
+  font-size: 11px;
+  font-weight: 600;
+  transition: var(--transition-fast);
 }
 
 .projects-action-btn.edit {
-  background-color: #ffc107;
-  color: #212529;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid rgba(251, 191, 36, 0.25);
 }
 
 .projects-action-btn.edit:hover {
-  background-color: #e0a800;
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.45);
+  box-shadow: var(--shadow-glow-warning);
+  transform: translateY(-1px);
 }
 
 .projects-action-btn.delete {
-  background-color: #dc3545;
-  color: white;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid rgba(248, 113, 113, 0.25);
 }
 
 .projects-action-btn.delete:hover {
-  background-color: #c82333;
-} 
+  background: rgba(248, 113, 113, 0.2);
+  border-color: rgba(248, 113, 113, 0.45);
+  box-shadow: var(--shadow-glow-danger);
+  transform: translateY(-1px);
+}

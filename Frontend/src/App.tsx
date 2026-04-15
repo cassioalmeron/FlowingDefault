@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Home from './Pages/Home/Index';
@@ -41,13 +41,13 @@ const AppLayout = () => {
       {/* Sidebar Navigation */}
       <nav className="sidebar">
         <div className="sidebar-links">
-          <Link to="/" className="sidebar-link">🏠 Home</Link>
-          <Link to="/users" className="sidebar-link">👥 Users</Link>
-          <Link to="/projects" className="sidebar-link">📁 Projects</Link>
-          <Link to="/labels" className="sidebar-link">🏷️ Labels</Link>
-          <Link to="/profile" className="sidebar-link">👤 Profile</Link>
+          <NavLink to="/" end className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>🏠 Home</NavLink>
+          <NavLink to="/users" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>👥 Users</NavLink>
+          <NavLink to="/projects" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>📁 Projects</NavLink>
+          <NavLink to="/labels" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>🏷️ Labels</NavLink>
+          <NavLink to="/profile" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>👤 Profile</NavLink>
         </div>
-        <button className="sidebar-link logout-btn" onClick={handleLogout} style={{ marginTop: 'auto', width: '100%' }}>
+        <button className="logout-btn" onClick={handleLogout} style={{ marginTop: 'auto' }}>
           🚪 Logout
         </button>
       </nav>

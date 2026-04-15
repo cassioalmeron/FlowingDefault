@@ -31,7 +31,6 @@ const Index = () => {
 
   const handleLogin = async () => {
     try {
-      // Validate form data
       await loginSchema.validate({ username, password }, { abortEarly: false })
       setErrors({});
       setLoading(true);

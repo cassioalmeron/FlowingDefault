@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
+import { session } from './session';
 
 export default function RequireAuth() {
-  const token = localStorage.getItem('token');
-  return token ? <Outlet /> : <Navigate to="/login" replace />;
-} 
+  return session.isAuthenticated() ? <Outlet /> : <Navigate to="/login" replace />;
+}
